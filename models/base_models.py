@@ -54,3 +54,24 @@ class FeatureExtractor(nn.Module):
         return x
 
 
+class FeatureClassifier(nn.Module):
+    """
+    Takes vector inputs and returns class probabilities
+    """
+    def __init__(self,in_features,num_classes):
+        super().__init__()
+        self.fc_1 = nn.Linear(in_features=in_features,out_features=in_features//5)
+        self.relu_1 = nn.ReLU()
+        self.fc_2 = nn.Linear(in_features=in_features//5,out_features=in_features//5)
+        self.relu_2 = nn.ReLU()
+        self.fc_3 = nn.Linear(in_features=in_features//5,out_features=num_classes)
+        self.s_max = nn.Softmax()
+
+    def forward(self,x):
+        x = self.fc_1(x)
+        x = self.relu_1(x)
+        x = self.fc_2(x)
+        x = self.relu_2(x)
+        x = self.fc_3(x)
+        out = self.s_max(x)
+        return out
