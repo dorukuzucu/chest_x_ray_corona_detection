@@ -4,11 +4,11 @@ from pathlib import Path
 import shutil
 
 
-root_dir = os.path.join(Path(__file__).parents[1], "data")
+root_dir = os.path.join(Path(__file__).parents[0])
 csv_file = "metadata.csv"
 metadata = pd.read_csv(os.path.join(root_dir,csv_file))
 
-target_dir = os.path.join(root_dir,"main_dataset")
+target_dir = Path(__file__).parents[2]
 
 print(metadata.head())
 covid_count = 0
@@ -22,13 +22,14 @@ for row in metadata.iterrows():
     label_2 = row[1]["Label_2_Virus_category"]
 
     if label=="Normal":
-        image_path = os.path.join(root_dir, "coronahack", dataset, file_name)
-        target_path = os.path.join(root_dir, dataset,"normal")
+        image_path = os.path.join(root_dir, dataset, file_name)
+        target_path = os.path.join(target_dir, dataset,"normal")
         shutil.copy2(image_path,target_path)
         normal_count+=1
     elif label!="Normal" and label_2=="COVID-19":
         image_path = os.path.join(root_dir, "coronahack", dataset, file_name)
-        target_path = os.path.join(root_dir, dataset, "covid")
+        target_path = os.path.join(target_dir, dataset, "covid")
+        shutil.copy2(image_path, target_path)
         covid_count+=1
 
 print("Total {} images are moved".format(covid_count+normal_count))

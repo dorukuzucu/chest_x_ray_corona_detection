@@ -8,13 +8,14 @@ from torchvision import utils
 from pathlib import Path
 import glob
 from random import shuffle
+import random
 from torchvision.datasets import ImageFolder
 import cv2
 from PIL import Image
 
 
 class ChestXrayDataset(Dataset):
-    def __init__(self,root_dir,train_val_split=0.8,train=True,transform=None):
+    def __init__(self,root_dir,train=True,transform=None,train_val_split=0.8,seed=2021):
         """
         :param root_dir: get train or test image list using glob
             then split them to train and validation using train_val_split
@@ -24,28 +25,30 @@ class ChestXrayDataset(Dataset):
         self.train = train
         self.transform = transform
         self.image_list = self._load_data(root_dir)
-        self.train_set,self.val_set = self._train_val_split(train_val_split)
+        self.train_set,self.val_set = self._train_val_split(train_val_split,seed)
 
     def _load_data(self,path):
         """
         :param path: path to dataset. folder should be split as /covid, /normal
-        :return: list of tuples for image path and label.
-            :return image_path: path to read image
+        :return: list of tuples for path path and label.
+            :return image_path: path to read path
             :return label: 1 for covid, other for normal patient
         """
         glob_path = path + os.sep + '*' + os.sep + '*'
         paths = glob.glob(pathname=glob_path, recursive=True)
-        labels = [1 if image.split(os.sep)[-2]=="covid" else 0 for image in images]
+        labels = [1 if path.split(os.sep)[-2]=="covid" else 0 for path in paths]
         assert len(paths)==len(labels)
 
         return [(paths[idx],labels[idx]) for idx in range(len(labels))]
 
-    def _train_val_split(self, split):
+    def _train_val_split(self, split,seed):
         """
         :param split: split ratio
+        :param seed: seed for splitting train and validation
         :return: splitted train and validation sets
         """
-        dataset = shuffle(self.image_list)
+        dataset = self.image_list.copy()
+        random.Random(seed).shuffle(dataset)
         train_set = dataset[int(len(dataset)*split):]
         val_set = dataset[:int(len(dataset)*split)]
         return train_set,val_set
