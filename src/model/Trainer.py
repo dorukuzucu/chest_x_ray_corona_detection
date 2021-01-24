@@ -6,6 +6,16 @@ from pathlib import Path
 
 class Trainer:
     def __init__(self, model, criteria, train_loader, val_loader, config):
+        """
+        :param model: A deep learning model extends to nn.Module
+        :param criteria: A loss function
+        :param train_loader: Data loader for training data set
+        :param val_loader: Data loader for validation data set
+        :param config: A dict data that should include following keys:
+            "number_of_epochs"
+            "val_every": optional
+
+        """
         self.model = model
         self.train_loader = train_loader
         self.val_loader = val_loader
@@ -75,7 +85,7 @@ class Trainer:
 
             val_loss += loss
             val_correct_prediction += sum(out == label)
-        print("Epoch:{} Loss:{} Accuracy:{}".format(epoch, val_loss / len(self.val_loader),
+        print("Validation: Loss:{} Accuracy:{}".format(val_loss / len(self.val_loader),
                                                     val_correct_prediction / len(self.val_loader)))
 
         self.metrics["val_loss"].append(val_loss / len(self.val_loader))
