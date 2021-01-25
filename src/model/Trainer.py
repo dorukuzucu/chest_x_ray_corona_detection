@@ -2,6 +2,7 @@ import os
 import torch
 from torch import optim
 from pathlib import Path
+from src.data.dataset import ChestXrayDataset
 
 
 class Trainer:
@@ -11,10 +12,14 @@ class Trainer:
         :param criteria: A loss function
         :param train_loader: Data loader for training data set
         :param val_loader: Data loader for validation data set
-        :param config: A dict data that should include following keys:
-            "number_of_epochs"
-            "val_every": optional
-
+        :param config: A dict data that includes configurations. You can refer to below:
+            conf = {
+                "number_of_epochs": 50,
+                "val_every": 5,
+                "optimizer": "SGD",
+                "lr": 0.004,
+                "device": "gpu"
+            }
         """
         self.model = model
         self.train_loader = train_loader
@@ -30,6 +35,8 @@ class Trainer:
         self.gpu_flag = self.__set_device()
         self.optimizer = self.__set_optimizer()
         self.RESULT_SAVE_PATH = os.path.join(Path(__file__).parents[2], "results") + os.path.sep
+        if self.gpu_flag:
+            self.model.cuda()
 
     def train_supervised(self,n_epochs=None):
         if self.gpu_flag:
@@ -64,8 +71,8 @@ class Trainer:
             self.optimizer.step()
 
             iter_loss += loss
-            iter_correct_prediction += sum(out == label)
-        self.metrics["train_loss"].append(iter_loss / len(self.train_loader))
+            iter_correct_prediction += (torch.max(out,1).indices==label).int().sum().item()
+            self.metrics["train_loss"].append(iter_loss / len(self.train_loader))
         self.metrics["train_acc"].append(iter_correct_prediction / len(self.train_loader))
 
 
@@ -84,7 +91,7 @@ class Trainer:
             loss = self.criteria(out, label)
 
             val_loss += loss
-            val_correct_prediction += sum(out == label)
+            val_correct_prediction += (torch.max(out,1).indices==label).int().sum().item()
         print("Validation: Loss:{} Accuracy:{}".format(val_loss / len(self.val_loader),
                                                     val_correct_prediction / len(self.val_loader)))
 
@@ -95,23 +102,25 @@ class Trainer:
         weight_decay = self.config["weight_decay"] if "weight_decay" in self.config else 0
         if self.config["optimizer"]=="SGD":
             momentum = self.config["momentum"] if "momentum" in self.config else 0
-            self.optimizer = optim.SGD(
+            optimizer = optim.SGD(
                 params=self.model.parameters(),lr=self.config["lr"],
                 weight_decay=weight_decay,momentum=momentum
             )
         else:
-            self.optimizer = optim.Adam(
+            optimizer = optim.Adam(
                 params=self.model.parameters(),
                 lr = self.config["lr"],
                 weight_decay=weight_decay
             )
+        return optimizer
 
     def __set_device(self):
         config_device = self.config["device"] if "device" in self.config else "cpu"
         if torch.cuda.is_available() and config_device=="gpu":
-            self.gpu_flag=True
+            gpu_flag=True
         else:
-            self.gpu_flag=False
+            gpu_flag=False
+        return gpu_flag
 
     def save_status(self):
         torch.save(self.model.state_dict(),self.RESULT_SAVE_PATH+"model.pth")
@@ -121,3 +130,4 @@ class Trainer:
         with open(self.RESULT_SAVE_PATH+"metrics.txt","w") as file:
             file.write(str(self.metrics)+"\n")
             file.close()
+

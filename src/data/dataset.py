@@ -15,7 +15,16 @@ from PIL import Image
 
 
 class ChestXrayDataset(Dataset):
-    def __init__(self,root_dir,train=True,transform=None,train_val_split=0.8,seed=2021):
+    def __init__(self,root_dir,
+                train=True,
+                transform=transforms.Compose([
+                transforms.Grayscale(),
+                transforms.Resize((224, 224)),
+                transforms.ToTensor(),
+                ]),
+                train_val_split=0.8,
+                seed=2021
+                ):
         """
         :param root_dir: get train or test image list using glob
             then split them to train and validation using train_val_split
@@ -49,8 +58,8 @@ class ChestXrayDataset(Dataset):
         """
         dataset = self.image_list.copy()
         random.Random(seed).shuffle(dataset)
-        train_set = dataset[int(len(dataset)*split):]
-        val_set = dataset[:int(len(dataset)*split)]
+        train_set = dataset[:int(len(dataset)*split)]
+        val_set = dataset[int(len(dataset)*split):]
         return train_set,val_set
 
     def __len__(self):
@@ -75,8 +84,6 @@ class ChestXrayDataset(Dataset):
             img_path, label = self.val_set[idx]
         """
         img = Image.open(img_path)
-        img = np.asarray(img)
-        if self.transform is not None:
-            img = self.transform(img)
+        img = self.transform(img)
 
-        return (img,label)
+        return (img, label)
