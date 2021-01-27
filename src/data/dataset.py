@@ -45,7 +45,17 @@ class ChestXrayDataset(Dataset):
         """
         glob_path = path + os.sep + '*' + os.sep + '*'
         paths = glob.glob(pathname=glob_path, recursive=True)
-        labels = [1 if path.split(os.sep)[-2]=="covid" else 0 for path in paths]
+        labels = []
+        for path in paths:
+            label = path.split(os.sep)[-2]
+            if label == "bacteria":
+                labels.append(0)
+            elif label == "covid":
+                labels.append(1)
+            elif label == "normal":
+                labels.append(2)
+            elif label == "virus":
+                labels.append(3)
         assert len(paths)==len(labels)
 
         return [(paths[idx],labels[idx]) for idx in range(len(labels))]
