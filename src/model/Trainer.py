@@ -33,14 +33,12 @@ class Trainer:
             "val_acc": []
         }
         self.gpu_flag = self.__set_device()
+        if self.gpu_flag:
+            self.model.to(torch.device('cuda:0'))
         self.optimizer = self.__set_optimizer()
         self.RESULT_SAVE_PATH = os.path.join(Path(__file__).parents[2], "results") + os.path.sep
-        if self.gpu_flag:
-            self.model.cuda()
 
     def train_supervised(self,n_epochs=None):
-        if self.gpu_flag:
-            self.model.cuda()
         if n_epochs is None:
             n_epochs = self.config["number_of_epochs"]
         val_every = self.config["val_every"] if "val_every" in self.config else 5
@@ -54,15 +52,16 @@ class Trainer:
                 self.save_status()
 
     def train_epoch(self):
-        iter_loss = 0
-        iter_correct_prediction = 0
+        iter_loss = float(0.0)
+        iter_correct_prediction = int(0)
         self.model.train()
 
         for data, label in self.train_loader:
+            self.optimizer.zero_grad()
             self.model.zero_grad()
             if self.gpu_flag:
-                data = data.cuda()
-                label = label.cuda()
+                data = data.to(torch.device('cuda:0'))
+                label = label.to(torch.device('cuda:0'))
 
             out = self.model(data)
             loss = self.criteria(out, label)
@@ -70,33 +69,32 @@ class Trainer:
             loss.backward()
             self.optimizer.step()
 
-            iter_loss += loss
+            iter_loss += float(loss.item())
             iter_correct_prediction += (torch.max(out,1).indices==label).int().sum().item()
             self.metrics["train_loss"].append(iter_loss / len(self.train_loader))
         self.metrics["train_acc"].append(iter_correct_prediction / len(self.train_loader))
-
+        torch.cuda.empty_cache()
 
     def evaluate(self):
-        val_loss = 0
+        val_loss = float(0.0)
         val_correct_prediction = 0
         self.model.eval()
+        with torch.no_grad():
+            for data, label in self.val_loader:
+                if self.gpu_flag:
+                    data = data.to(torch.device('cuda:0'))
+                    label = label.to(torch.device('cuda:0'))
 
-        for data, label in self.val_loader:
-            self.model.zero_grad()
-            if self.gpu_flag:
-                data = data.cuda()
-                label = label.cuda()
+                out = self.model(data)
+                loss = self.criteria(out, label)
 
-            out = self.model(data)
-            loss = self.criteria(out, label)
+                val_loss += float(loss.item())
+                val_correct_prediction += (torch.max(out,1).indices==label).int().sum().item()
+            print("Validation: Loss:{} Accuracy:{}".format(val_loss / len(self.val_loader),
+                                                        val_correct_prediction / len(self.val_loader)))
 
-            val_loss += loss
-            val_correct_prediction += (torch.max(out,1).indices==label).int().sum().item()
-        print("Validation: Loss:{} Accuracy:{}".format(val_loss / len(self.val_loader),
-                                                    val_correct_prediction / len(self.val_loader)))
-
-        self.metrics["val_loss"].append(val_loss / len(self.val_loader))
-        self.metrics["val_accuracy"].append(val_correct_prediction / len(self.val_loader))
+            self.metrics["val_loss"].append(val_loss / len(self.val_loader))
+            self.metrics["val_accuracy"].append(val_correct_prediction / len(self.val_loader))
 
     def __set_optimizer(self):
         weight_decay = self.config["weight_decay"] if "weight_decay" in self.config else 0
