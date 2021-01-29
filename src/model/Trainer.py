@@ -70,7 +70,7 @@ class Trainer:
 
             out = self.model(data)
             #loss = self.criteria(out.float(), label.float().view(-1,1))
-            loss = self.criteria(out.long(), label.long().view(-1,1))
+            loss = self.criteria(out, label.view(-1,1))
 
             loss.backward()
             self.optimizer.step()
@@ -94,7 +94,7 @@ class Trainer:
 
                 out = self.model(data)
                 #loss = self.criteria(out.float(), label.float().view(-1, 1))
-                loss = self.criteria(out.long(), label.long().view(-1, 1))
+                loss = self.criteria(out, label.view(-1, 1))
 
                 val_loss += float(loss.item())
                 val_correct_prediction += (torch.max(out.detach(), 1).indices==label).int().sum().item()
