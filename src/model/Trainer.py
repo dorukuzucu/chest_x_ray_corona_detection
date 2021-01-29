@@ -58,10 +58,9 @@ class Trainer:
         iter_loss = float(0.0)
         iter_correct_prediction = int(0)
         self.model.train()
-        itr=1
+        
         for data, label in self.train_loader:
-            print("batch:{}".format(itr))
-            itr+=1
+            
             self.optimizer.zero_grad()
             self.model.zero_grad()
             if self.gpu_flag:
