@@ -13,7 +13,8 @@ conf = {
     "val_every": 5,
     "optimizer": "SGD",
     "lr": 0.004,
-    "device": "cpu"
+    "device": "cpu",
+    "result_path":os.path.join(Path(__file__).parents[2], "results") + os.path.sep
 }
 
 ########################################################

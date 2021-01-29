@@ -18,7 +18,8 @@ class Trainer:
                 "val_every": 5,
                 "optimizer": "SGD",
                 "lr": 0.004,
-                "device": "gpu"
+                "device": "gpu",
+                "result_path":"path_string"
             }
         """
         self.model = model
@@ -36,7 +37,7 @@ class Trainer:
         if self.gpu_flag:
             self.model.to(torch.device('cuda:0'))
         self.optimizer = self.__set_optimizer()
-        self.RESULT_SAVE_PATH = os.path.join(Path(__file__).parents[2], "results") + os.path.sep
+        self.RESULT_SAVE_PATH = self.config["result_path"]
 
     def train_supervised(self,n_epochs=None):
         if n_epochs is None:
