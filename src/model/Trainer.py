@@ -19,7 +19,8 @@ class Trainer:
                 "optimizer": "SGD",
                 "lr": 0.004,
                 "device": "gpu",
-                "result_path":"path_string"
+                "result_path":"path_string",
+                "batch_size":16
             }
         """
         self.model = model
@@ -77,7 +78,7 @@ class Trainer:
             iter_correct_prediction += (torch.max(out.detach(), 1).indices==label).int().sum().item()
             self.metrics["train_loss"].append(iter_loss / len(self.train_loader))
             
-        self.metrics["train_acc"].append(iter_correct_prediction / len(self.train_loader))
+        self.metrics["train_acc"].append(iter_correct_prediction / (len(self.train_loader) * self.config["batch_size"]))
         torch.cuda.empty_cache()
 
     def evaluate(self):
@@ -99,7 +100,7 @@ class Trainer:
                                                         val_correct_prediction / len(self.val_loader)))
 
             self.metrics["val_loss"].append(val_loss / len(self.val_loader))
-            self.metrics["val_accuracy"].append(val_correct_prediction / len(self.val_loader))
+            self.metrics["val_acc"].append(val_correct_prediction / (len(self.val_loader) * self.config["batch_size"]))
 
     def __set_optimizer(self):
         weight_decay = self.config["weight_decay"] if "weight_decay" in self.config else 0
