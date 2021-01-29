@@ -97,7 +97,7 @@ class Trainer:
                 val_loss += float(loss.item())
                 val_correct_prediction += (torch.max(out.detach(), 1).indices==label).int().sum().item()
             print("Validation: Loss:{} Accuracy:{}".format(val_loss / len(self.val_loader),
-                                                        val_correct_prediction / len(self.val_loader)))
+                                                        val_correct_prediction / len(self.val_loader) / self.config["batch_size"]))
 
             self.metrics["val_loss"].append(val_loss / len(self.val_loader))
             self.metrics["val_acc"].append(val_correct_prediction / (len(self.val_loader) * self.config["batch_size"]))
@@ -127,11 +127,11 @@ class Trainer:
         return gpu_flag
 
     def save_status(self):
-        torch.save(self.model.state_dict(),self.RESULT_SAVE_PATH+"model.pth")
+        torch.save(self.model.state_dict(), os.path.join(self.RESULT_SAVE_PATH, "model.pth"))
         self.save_metrics()
 
     def save_metrics(self):
-        with open(self.RESULT_SAVE_PATH+"metrics.txt","w") as file:
+        with open( os.path.join(self.RESULT_SAVE_PATH, "metrics.txt"), "w") as file:
             file.write(str(self.metrics)+"\n")
             file.close()
 
