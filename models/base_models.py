@@ -141,6 +141,5 @@ class NarrowFeatureClassifier(nn.Module):
     def forward(self,x):
         x = F.relu(self.fc_1(x))
         x = self.fc_2(x)
-        x = self.relu_2(x)
         out = self.s_max(x)
         return out

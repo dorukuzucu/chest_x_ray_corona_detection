@@ -31,10 +31,18 @@ class ChestXrayDataset(Dataset):
             PS: FOLDERS BASED ON LABEL NAMES
         :param transform: transforms to be applied on data set
         """
+        self.idx_labels = self._paths_to_labels(root_dir)
         self.train = train
         self.transform = transform
         self.image_list = self._load_data(root_dir)
         self.train_set,self.val_set = self._train_val_split(train_val_split,seed)
+
+    def _paths_to_labels(self, path):
+        glob_path = path + os.sep + '*' + os.sep + '*'
+        paths = glob.glob(pathname=glob_path, recursive=True)
+        labels = [path.split(os.sep)[-2] for path in paths]
+        unique_labels = set(labels)
+        return {label:idx for idx,label in enumerate(unique_labels)}
 
     def _load_data(self,path):
         """
@@ -45,17 +53,9 @@ class ChestXrayDataset(Dataset):
         """
         glob_path = path + os.sep + '*' + os.sep + '*'
         paths = glob.glob(pathname=glob_path, recursive=True)
-        labels = []
-        for path in paths:
-            label = path.split(os.sep)[-2]
-            if label == "bacteria":
-                labels.append(0)
-            elif label == "covid":
-                labels.append(1)
-            elif label == "normal":
-                labels.append(2)
-            elif label == "virus":
-                labels.append(3)
+        label_names = [path.split(os.sep)[-2] for path in paths]
+        labels = [self.idx_labels[label] for label in label_names]
+
         assert len(paths)==len(labels)
 
         return [(paths[idx],labels[idx]) for idx in range(len(labels))]

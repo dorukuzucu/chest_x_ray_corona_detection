@@ -56,8 +56,10 @@ class Trainer:
         iter_loss = float(0.0)
         iter_correct_prediction = int(0)
         self.model.train()
-
+        itr=1
         for data, label in self.train_loader:
+            print("batch:{}".format(itr))
+            itr+=1
             self.optimizer.zero_grad()
             self.model.zero_grad()
             if self.gpu_flag:
@@ -65,14 +67,15 @@ class Trainer:
                 label = label.to(torch.device('cuda:0'))
 
             out = self.model(data)
-            loss = self.criteria(out, label)
+            loss = self.criteria(out.float(), label.float().view(-1,1))
 
             loss.backward()
             self.optimizer.step()
 
             iter_loss += float(loss.item())
-            iter_correct_prediction += (torch.max(out,1).indices==label).int().sum().item()
+            iter_correct_prediction += (torch.max(out.detach(), 1).indices==label).int().sum().item()
             self.metrics["train_loss"].append(iter_loss / len(self.train_loader))
+            break
         self.metrics["train_acc"].append(iter_correct_prediction / len(self.train_loader))
         torch.cuda.empty_cache()
 
@@ -87,10 +90,10 @@ class Trainer:
                     label = label.to(torch.device('cuda:0'))
 
                 out = self.model(data)
-                loss = self.criteria(out, label)
+                loss = self.criteria(out.float(), label.float().view(-1, 1))
 
                 val_loss += float(loss.item())
-                val_correct_prediction += (torch.max(out,1).indices==label).int().sum().item()
+                val_correct_prediction += (torch.max(out.detach(), 1).indices==label).int().sum().item()
             print("Validation: Loss:{} Accuracy:{}".format(val_loss / len(self.val_loader),
                                                         val_correct_prediction / len(self.val_loader)))
 
