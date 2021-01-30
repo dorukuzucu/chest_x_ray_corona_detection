@@ -41,7 +41,7 @@ class ChestXrayDataset(Dataset):
         glob_path = path + os.sep + '*' + os.sep + '*'
         paths = glob.glob(pathname=glob_path, recursive=True)
         labels = [path.split(os.sep)[-2] for path in paths]
-        unique_labels = set(labels)
+        unique_labels = sorted(set(labels))
         return {label:idx for idx,label in enumerate(unique_labels)}
 
     def _load_data(self,path):

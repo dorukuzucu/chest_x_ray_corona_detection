@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 
 
-def eval(model,dataloader, criteria, batch_size):
+def eval(model,dataloader, criteria, batch_size,gpu_f=True):
     """
     :param model: model to be tested
     :param dataloader: dataloader for testing set
@@ -12,11 +12,10 @@ def eval(model,dataloader, criteria, batch_size):
     :param batch_size: batchsize in dataloader
     :return: return predictions and targets as tuple
     """
-    data_count = batch_size*len(dataloader)
     eval_loss = float(0.0)
     eval_correct_prediction = 0
 
-    if torch.cuda.is_available():
+    if torch.cuda.is_available() and gpu_f:
         gpu_flag = True
     else:
         gpu_flag = False
@@ -52,8 +51,8 @@ def eval(model,dataloader, criteria, batch_size):
             target = torch.cat((target,label),dim=0)
             eval_loss += float(loss.item())
             eval_correct_prediction += (iter_preds == label).int().sum().item()
-        print("Validation: Loss:{} Accuracy:{}".format(eval_loss / data_count,
-                                                       eval_correct_prediction / data_count))
+        print("Validation: Loss:{} Accuracy:{}".format(eval_loss / len(dataloader)/batch_size,
+                                                       eval_correct_prediction / len(dataloader)/batch_size))
     return (preds.cpu().numpy(),target.cpu().numpy())
 
 def eval_scores(preds,targets,path=None,file_name=None):
