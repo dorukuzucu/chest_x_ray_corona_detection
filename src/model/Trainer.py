@@ -79,8 +79,8 @@ class Trainer:
 
             iter_loss += float(loss.item())
             iter_correct_prediction += (torch.max(out.detach(), 1).indices==label).int().sum().item()
-            self.metrics["train_loss"].append(iter_loss / len(self.train_loader))
-            
+        
+        self.metrics["train_loss"].append(iter_loss / len(self.train_loader))    
         self.metrics["train_acc"].append(iter_correct_prediction / (len(self.train_loader) * self.config["batch_size"]))
         torch.cuda.empty_cache()
 
