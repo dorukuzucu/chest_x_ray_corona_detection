@@ -27,9 +27,13 @@ def eval(model,dataloader, criteria, batch_size):
     model.eval()
     with torch.no_grad():
         # save for confusion matrix
-        preds = torch.tensor([])
-        target = torch.tensor([])
-        idx = 0
+        if gpu_flag:
+            preds = torch.tensor([]).to(torch.device('cuda:0'))
+            target = torch.tensor([]).to(torch.device('cuda:0'))
+        else:
+            preds = torch.tensor([])
+            target = torch.tensor([])
+
         for data, label in dataloader:
             if gpu_flag:
                 data = data.to(torch.device('cuda:0'))
