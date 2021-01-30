@@ -49,7 +49,7 @@ class Trainer:
             self.train_epoch()
             print("Epoch:{} Loss:{} Accuracy:{}".format(epoch, self.metrics["train_loss"][epoch],
                                                         self.metrics["train_acc"][epoch]))
-            if epoch % val_every == 0:
+            if epoch+1 % val_every == 0:
                 self.optimizer.zero_grad(set_to_none=True)
                 self.evaluate()
                 self.save_status()
