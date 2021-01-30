@@ -54,7 +54,7 @@ def eval(model,dataloader, criteria, batch_size):
             eval_correct_prediction += (iter_preds == label).int().sum().item()
         print("Validation: Loss:{} Accuracy:{}".format(eval_loss / data_count,
                                                        eval_correct_prediction / data_count))
-    return (preds.numpy(),target.numpy())
+    return (preds.cpu().numpy(),target.cpu().numpy())
 
 def eval_scores(preds,targets,path=None,file_name=None):
     """
@@ -72,11 +72,12 @@ def eval_scores(preds,targets,path=None,file_name=None):
     conf_mat = calculate_confusion_matrix(preds,targets)
 
     if isinstance(path,str) and isinstance(file_name,str): # save if path and filename are provided
-        with open(os.path.join(path, file_name), "w") as file:
+        with open(os.path.join(path, file_name)+".txt", "w") as file:
             file.write(str(accuracy) + "\n")
             file.write(str(precision) + "\n")
             file.write(str(recall) + "\n")
             file.write(str(conf_mat) + "\n")
             file.close()
             print("Results are written to {}.txt".format(file_name))
+        save_confusion_matrix(conf_mat,"Confusion Matrix",os.path.join(path, file_name))
     return (accuracy,precision,recall,conf_mat)
