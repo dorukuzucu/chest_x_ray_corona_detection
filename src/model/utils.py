@@ -5,7 +5,7 @@ import numpy as np
 
 def save_confusion_matrix(confisuon_matrix,title,filename):
     # plot confusion matrix
-    fig,ax = plt.subplots()
+    fig,ax = plt.subplots(figsize = (10,7))
     ax.matshow(confisuon_matrix, cmap=plt.cm.Blues)
     ax.set_title(title)
     for i in range(4):
