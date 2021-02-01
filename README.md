@@ -6,7 +6,7 @@ Please follow guides in chest_xray.ipynb file
   - Github repo is public so you can directly download our repo using notebook file. 
   - ipynb file imports all the source code from our github repo. After downloading, you can execute it. 
   - Do not forget to change dataset paths in ipynb file. 
-  - We have added sample data for each class just in case. You can import them from downloaded git repository.
+  - We have added sample data for each class just in case. You can import them from downloaded git repository.("TRAIN" and "TEST" folders.)
   
   Members:
   1) Doruk Beren Kuzucu - 504191348 - dorukuzucu@gmail.com, kuzucud@itu.edu.tr
