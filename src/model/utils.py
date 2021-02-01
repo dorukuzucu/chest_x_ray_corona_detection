@@ -8,8 +8,8 @@ def save_confusion_matrix(confisuon_matrix,title,filename):
     fig,ax = plt.subplots()
     ax.matshow(confisuon_matrix, cmap=plt.cm.Blues)
     ax.set_title(title)
-    for i in range(2):
-        for j in range(2):
+    for i in range(4):
+        for j in range(4):
             c = confisuon_matrix[i][j]
             ax.text(j, i, str(c), va='center', ha='center')
             time.sleep(0.5)
