@@ -7,6 +7,7 @@ Please follow guides in chest_xray.ipynb file
   - ipynb file imports all the source code from our github repo. After downloading, you can execute it. 
   - Do not forget to change dataset paths in ipynb file. 
   - We have added sample data for each class just in case. You can import them from downloaded git repository.("TRAIN" and "TEST" folders.)
+  - Also you can use train and test scripts for local training which utilizes sample data
   
   Members:
   1) Doruk Beren Kuzucu - 504191348 - dorukuzucu@gmail.com, kuzucud@itu.edu.tr
