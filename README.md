@@ -15,4 +15,9 @@ Please follow guides in chest_xray.ipynb file
   2) Osman Demirel - 514191073 - demirelo20@itu.edu.tr
   
   Feel free to contact us is you bump into any issues
+
+Dataset Sources:
+1) https://www.kaggle.com/praveengovi/coronahack-chest-xraydataset
+2) https://www.kaggle.com/nabeelsajid917/covid-19-x-ray-10000-images
+3) https://github.com/ieee8023/covid-chestxray-dataset
   
