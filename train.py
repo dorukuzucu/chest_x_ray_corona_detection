@@ -14,15 +14,15 @@ conf = {
     "optimizer": "SGD",
     "lr": 0.004,
     "device": "cpu",
-    "result_path":os.path.join(Path(__file__).parents[2], "results") + os.path.sep
+    "result_path":os.path.join(Path(__file__).parents[0]) + os.path.sep
 }
 
 ########################################################
 ################ GET DATALOADER #########################
 ########################################################
 
-project_path = Path(__file__).parents[1]
-dataset_path = os.path.join(project_path,"data","train")
+project_path = Path(__file__).parents[0]
+dataset_path = os.path.join(project_path,"data","TRAIN")
 dataset = ChestXrayDataset(root_dir=dataset_path)
 val_set = ChestXrayDataset(root_dir=dataset_path,train=False,train_val_split=0.2)
 train_loader = DataLoader(dataset=dataset, batch_size=16)
@@ -45,5 +45,6 @@ print("Model and loss are prepared")
 
 print("Starting to train")
 trainer = Trainer(model=net, criteria=loss, train_loader=train_loader,val_loader=val_loader,config=conf)
-trainer.train_epoch()
+#trainer.train_epoch()
+trainer.train_supervised()
 print("Done")

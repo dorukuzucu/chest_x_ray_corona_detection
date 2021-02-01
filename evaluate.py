@@ -7,7 +7,7 @@ from src.model.eval import *
 from pathlib import Path
 import os
 
-path = os.path.join(Path(__file__).parents[1],"data","test_final")
+path = os.path.join(Path(__file__).parents[0],"data","TEST")
 
 test_data = ChestXrayDataset(path)
 print(test_data.idx_labels)
@@ -24,7 +24,11 @@ num_classes = 4
 #m = CXRNet(in_channels, out_channels, in_features, num_classes)
 m = CXRNet2(in_channels, out_channels, in_features, num_classes)
 
-model_path = os.path.join(Path(__file__).parents[1],"data","model.pth")
+model_path = None # please add a model here
+
+if model_path==None:
+    raise Exception("Please load weights to a CXRNet or CXRNet2 Model")
+
 weights = torch.load(model_path)
 
 m.load_state_dict(weights)
