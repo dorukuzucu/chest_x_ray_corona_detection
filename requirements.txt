@@ -1,0 +1,7 @@
+matplotlib==3.3.*
+petastorm==0.9.*
+torch==1.7.*
+scipy==1.5.*
+torchvision==0.8.*
+scikit-learn==0.23.*
+Pillow==8.0.*
